@@ -46,19 +46,15 @@ class BaseModel:
 
     def to_dict(self):
         """Convert instance into dict format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        for key in dictionary.keys():
-            if key == '_sa_instance_state':
-                dictionary.pop(key)
-        return dictionary
+        new_dict = self.__dict__.copy()
+        new_dict.update({'__class__': self.__class__.__name__})
+        new_dict.update({'created_at': self.created_at.isoformat()})
+        new_dict.update({'updated_at': self.updated_at.isoformat()})
+        if '_sa_instance_state' in new_dict.keys():
+            del(new_dict['_sa_instance_state'])
+        return new_dict
 
     def delete(self):
         '''Deletes object from file storage'''
         from models import storage
         storage.delete(self)
-
