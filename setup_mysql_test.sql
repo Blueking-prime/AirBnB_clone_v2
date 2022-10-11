@@ -13,3 +13,4 @@ GRANT ALL PRIVILEGES ON hbnb_test_db.*
 -- Grant permission on performance_schema
 GRANT SELECT ON performance_schema.*
    TO 'hbnb_test'@'localhost';
+FLUSH PRIVILEGES;
