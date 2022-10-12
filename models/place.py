@@ -9,39 +9,52 @@ from models.base_model import Base, BaseModel
 import os
 import models
 
-if stor_type == 'db':
-    place_amenity = Table('place_amenity', Base.metadata,
-                          Column('place_id', String(60),
-                                 ForeignKey('places.id'),
-                                 primary_key=True),
-                          Column('amenity_id', String(60),
-                                 ForeignKey('amenities.id'),
-                                 primary_key=True))
+
+place_amenity = Table(
+    'place_amenity',
+    Base.metadata,
+    Column(
+        'place_id', String(60), ForeignKey('places.id'),
+        nullable=False, primary_key=True),
+    Column(
+        'amenity_id', String(60), ForeignKey('amenities.id'),
+        nullable=False, primary_key=True)
+)
 
 
 class Place(BaseModel, Base):
-    """ A place to stay """
-    __tablename__ = 'places'
+    """class Place
+    Attributes:
+        city_id (str): City ID.
+        user_id (str): User ID.
+        name (str): Place name.
+        description (str): Place description.
+        number_rooms (int): Number of rooms.
+        number_bathrooms (int): Number of bathrooms.
+        max_guest (int): Maximum number of guests.
+        price_by_night (int): Price per night.
+        latitude (float): Latitude.
+        longitude (float): Longitude.
+        amenity_ids (list of str): List of amenities.
+    """
+    __tablename__ = "places"
 
-    if stor_type == 'db':
-        city_id = Column(String(60), ForeignKey('cities.id'),
-                         nullable=False)
-        user_id = Column(String(60), ForeignKey('users.id'),
-                         nullable=False)
+    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+        reviews = relationship("Review", passive_deletes=True, backref="place")
+        amenities = relationship(
+            "Amenity", secondary=place_amenity,
+            back_populates="place_amenities", viewonly=False)
+        city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
+        user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
         name = Column(String(128), nullable=False)
-        description = Column(String(1024))
+        description = Column(String(1024), nullable=True)
         number_rooms = Column(Integer, nullable=False, default=0)
         number_bathrooms = Column(Integer, nullable=False, default=0)
         max_guest = Column(Integer, nullable=False, default=0)
         price_by_night = Column(Integer, nullable=False, default=0)
-        latitude = Column(Float)
-        longitude = Column(Float)
-        amenity_ids = []
+        latitude = Column(Float, nullable=True)
+        longitude = Column(Float, nullable=True)
 
-        reviews = relationship("Review", back_populates='place',
-                               cascade="all, delete, delete-orphan")
-        amenities = relationship("Amenity", secondary=place_amenity,
-                                 backref='place_amenities', viewonly=False)
     else:
         city_id = ""
         user_id = ""
@@ -55,34 +68,34 @@ class Place(BaseModel, Base):
         longitude = 0.0
         amenity_ids = []
 
-    @property
-    def reviews(self):
-        '''returns the list of Review instances
-        with place_id equals to the current Place.id'''
-        from models import storage
-        dicts = storage.all(Review)
-        review_list = []
-        for key in dicts.keys():
-            if dicts[key]['place_id'] == self.id:
-                review_list.append(dicts[key])
-        return review_list
+        @property
+        def reviews(self):
+            """
+            """
+            reviews_dict = models.storage.all(models.Review)
+            reviews_list = []
+            for review in reviews_dict.values():
+                if review.place_id == self.id:
+                    review_list.append(review)
+            return review
 
-    @property
-    def amenities(self):
-        '''returns the list of Amenity instances
-        based on the attribute amenity_ids'''
-        from models import storage
-        dicts = storage.all(Amenity)
-        amenities_list = []
-        for key in dicts.keys():
-            if dicts[key]['place_id'] in self.amenity_ids:
-                amenities_list.append(dicts[key])
-        return amenities_list
+        @property
+        def amenities(self):
+            """
+            Gets the list of Amenity objects
+            """
+            obj_list = []
+            objs = models.storage.all('Amenity')
+            for amenity in objs.values():
+                if amenity.id in amenity_ids:
+                    obj_list.append(amenity)
+            return obj_list
 
-    @amenities.setter
-    def amenities(self, obj):
-        '''handles append method
-        for adding an Amenity.id to the attribute amenity_ids'''
-        if obj is not None and isinstance(obj, Amenity):
-            if obj.id not in self.amenity_ids:
-                self.amenity_ids.append(obj.id)
+        @amenities.setter
+        def amenities(self, obj):
+            """
+            Sets an amenity to Place
+            """
+            if isinstance(obj, Amenity):
+                if self.id == obj.place_id:
+                    self.amenity_ids.append(obj.id)
