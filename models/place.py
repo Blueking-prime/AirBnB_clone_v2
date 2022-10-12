@@ -1,12 +1,9 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import relationship
-from models import stor_type
-from models.amenity import Amenity
-from models.review import Review
-from models.base_model import Base, BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import String, Column, ForeignKey, Integer, Float, Table
 import os
+from sqlalchemy.orm import relationship
 import models
 
 
