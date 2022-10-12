@@ -6,6 +6,8 @@ from models import stor_type
 from models.amenity import Amenity
 from models.review import Review
 from models.base_model import Base, BaseModel
+import os
+import models
 
 if stor_type == 'db':
     place_amenity = Table('place_amenity', Base.metadata,
