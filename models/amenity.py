@@ -1,15 +1,21 @@
-#!/usr/bin/python3
-""" State Module for HBNB project """
+#!/usr/bin/python
+""" holds class Amenity"""
+import models
+from models.base_model import BaseModel, Base
+from os import getenv
+import sqlalchemy
 from sqlalchemy import Column, String
-from models import stor_type
-from models.base_model import Base, BaseModel
+from sqlalchemy.orm import relationship
 
 
 class Amenity(BaseModel, Base):
-    '''Amneities eh'''
-    __tablename__ = 'amenities'
-
-    if stor_type == 'db':
+    """Representation of Amenity """
+    if models.storage_t == 'db':
+        __tablename__ = 'amenities'
         name = Column(String(128), nullable=False)
     else:
-        name = ''
+        name = ""
+
+    def __init__(self, *args, **kwargs):
+        """initializes Amenity"""
+        super().__init__(*args, **kwargs)
