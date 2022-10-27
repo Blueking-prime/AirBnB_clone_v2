@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 '''distributes archive to web servers'''
+
 from fabric.api import local, put, run, env, runs_once
 from os.path import splitext
 
@@ -12,11 +13,12 @@ def do_pack():
     '''Pack web_static contents into archive'''
     local('mkdir -p versions')
     arch = local('echo "web_static_$(date +%Y%m%d%H%M%S).tgz"', capture=True)
-    result = local(f'tar -cvzf versions/{arch} web_static')
+    result = local('tar -cvzf versions/{} web_static'.format(arch))
+
     if result.failed:
         return None
     else:
-        return f'versions/{arch}'
+        return 'versions/{}'.format(arch)
 
 
 def do_deploy(archive_path):
@@ -26,15 +28,15 @@ def do_deploy(archive_path):
     try:
         put(archive_path, '/tmp/')
         archive_no_ext, ext = splitext(archive_path)
-        archive_no_fold = archive_path.removeprefix('versions/')
-        run(f'mkdir -p /data/web_static/releases/{archive_no_ext}/')
-        archive_location = f'/data/web_static/releases/{archive_no_ext}/'
-        run(f'tar -xzf /tmp/{archive_no_fold} -C {archive_location}')
-        run(f'rm /tmp/{archive_no_fold}')
-        run(f'mv {archive_location}/web_static/* {archive_location}')
-        run(f'rm -rf {archive_location}/web_static')
+        archive_no_fold = archive_path.replace('versions/', '')
+        run('mkdir -p /data/web_static/releases/{}/'.format(archive_no_ext))
+        archive_loc = '/data/web_static/releases/{}/'.format(archive_no_ext)
+        run('tar -xzf /tmp/{} -C {}'.format(archive_no_fold, archive_loc))
+        run('rm /tmp/{}'.format(archive_no_fold))
+        run('mv {}/web_static/* {}'.format(archive_loc, archive_loc))
+        run('rm -rf {}/web_static'.format(archive_loc))
         run('rm -rf /data/web_static/current')
-        run(f'ln -s {archive_location} /data/web_static/current')
+        run('ln -s {} /data/web_static/current'.format(archive_loc))
     except Exception:
         return False
     else:
