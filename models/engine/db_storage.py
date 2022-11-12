@@ -73,4 +73,4 @@ class DBStorage:
 
     def close(self):
         '''Reloads items?'''
-        self.__session.remove()
+        self.__session.close()
