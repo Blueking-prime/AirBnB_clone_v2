@@ -18,12 +18,12 @@ class State(BaseModel, Base):
     else:
         name = ''
 
-    @property
-    def cities(self):
-        from models import storage
-        dicts = storage.all(City)
-        review_list = []
-        for key in dicts.keys():
-            if dicts[key]['state_id'] == self.id:
-                review_list.append({key: dicts[key]})
-        return review_list
+        @property
+        def cities(self):
+            from models import storage
+            dicts = storage.all(City)
+            review_list = []
+            for key in dicts.keys():
+                if dicts[key]['state_id'] == self.id:
+                    review_list.append({key: dicts[key]})
+            return review_list
