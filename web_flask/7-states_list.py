@@ -14,7 +14,7 @@ def display_states():
 
 
 @app.teardown_appcontext
-def clean_up(exception):
+def clean_up(exc):
     '''Removes the current sqlalchemy session'''
     storage.close()
 
