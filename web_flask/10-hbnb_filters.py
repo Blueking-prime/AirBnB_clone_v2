@@ -6,15 +6,16 @@ from models import storage
 app = Flask(__name__)
 
 
-@app.route('/states_list', strict_slashes=False)
+@app.route('/hbnb_filters', strict_slashes=False)
 def display_states():
-    '''Prints hello hbnb'''
+    '''Loads data into page'''
     states = storage.all('State')
-    return render_template('7-states_list.html', states=states)
+    amenities = storage.all('Amenity')
+    return render_template('10-hbnb_filters.html', states=states, amenities=amenities)
 
 
 @app.teardown_appcontext
-def teardown(exception):
+def clean_up(exception):
     '''Removes the current sqlalchemy session'''
     storage.close()
 

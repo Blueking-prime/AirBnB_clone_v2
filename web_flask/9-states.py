@@ -17,12 +17,12 @@ def display_states():
 def display_state(id):
     '''Prints hello hbnb'''
     states = storage.all('State')
-    for state in states:
-        if state.id == id:
-            return render_template('9-states.html', states=states)
-        break
-    else:
-        return render_template('9-states.html', states=states)
+    for state in states.values():
+        if id == state.id:
+            cities = state.cities
+        else:
+            cities = None
+    return render_template('9-states.html', cities=cities)
 
 
 @app.teardown_appcontext
