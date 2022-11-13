@@ -8,14 +8,14 @@ app = Flask(__name__)
 
 @app.route('/states_list', strict_slashes=False)
 def display_states():
-    '''Prints hello hbnb'''
+    """Prints hello hbnb"""
     states = storage.all('State')
     return render_template('7-states_list.html', states=states)
 
 
 @app.teardown_appcontext
 def teardown(exception):
-    '''Removes the current sqlalchemy session'''
+    """Removes the current sqlalchemy session"""
     storage.close()
 
 
